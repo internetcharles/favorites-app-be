@@ -468,6 +468,24 @@ describe('app routes', () => {
       done();
     });
 
+    test('deletes movie', async(done) => {
+      const expectation = [];
 
+      await fakeRequest(app)
+      .delete('/api/favorites/2')
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+      const data = await fakeRequest(app)
+      .get('/api/favorites')
+      .set('Authorization', token)
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+      expect(data.body).toEqual(expectation);
+
+      done();
+    })
 
 });
