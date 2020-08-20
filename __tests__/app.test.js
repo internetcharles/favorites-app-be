@@ -450,6 +450,24 @@ describe('app routes', () => {
       done();
     });
 
+    test('gets favs', async(done) => {
+      const expectation = [{
+        ...beeMovie,
+        id: 2,
+        owner_id: 2
+      }];
+  
+      const data = await fakeRequest(app)
+        .get('/api/favorites')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+  
+      expect(data.body).toEqual(expectation);
+  
+      done();
+    });
+
 
 
 });
