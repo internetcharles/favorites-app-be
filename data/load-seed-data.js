@@ -25,12 +25,12 @@ async function run() {
     const user = users[0].rows[0];
 
     await Promise.all(
-      animals.map(animal => {
+      movies.map(movie => {
         return client.query(`
                     INSERT INTO movies (title, rating, image, overview, owner_id)
                     VALUES ($1, $2, $3, $4, $5);
                 `,
-        [movies.title, movies.rating, movies.image, movies.overview, user.id]);
+        [movie.title, movie.rating, movie.image, movie.overview, user.id]);
       })
     );
     
