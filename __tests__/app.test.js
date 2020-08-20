@@ -7,15 +7,40 @@ const app = require('../lib/app');
 const client = require('../lib/client');
 
 describe('app routes', () => {
-  beforeAll(done => {
-    return client.connect(done);
-  });
 
-  beforeEach(() => {
-    // TODO: ADD DROP SETUP DB SCRIPT
+  const beeMovie = {
+    title: 'bee movie',
+    rating: 10,
+    image: 'bee.jpeg',
+    overview: 'go bee',
+  };
+
+  let token;
+
+  beforeAll(async done => {
+
     execSync('npm run setup-db');
+
+    client.connect();
+
+    const signInData = await fakeRequest(app)
+    .post('/auth/signup')
+    .send({
+      email: 'jon@user.com',
+      password: '1234'
+    });
+
+    token = signInData.body.token;
+
+    return done();
+
   });
 
+
+
+
+
+  
   afterAll(done => {
     return client.end(done);
   });
@@ -394,17 +419,37 @@ describe('app routes', () => {
                 "overview": "After a strange meteor destroys a communications satellite and crashes into Tampa Bay, a sickly looking fish finds itself the meal of a beautiful nightclub bartender named Val. Moments later, as the bar is closed and locked tight, the infected Val becomes ill and all Hell breaks loose. Hidden from the others, the parasite she has unknowingly eaten rapidly grows, bursting from her throat and becoming the puppet master for the chaos ahead. With no possible way to reach help or escape, the trapped club-goers must fight to survive and plan to destroy the creature before it is let loose into the world.",
                 "release_date": "2012-06-26"
             }
-        ]
-    ;
+        ];
 
     const data = await fakeRequest(app)
-      .get('/search?searchQuery=parasite')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    .get('/search?searchQuery=parasite')
+    .expect('Content-Type', /json/)
+    .expect(200);
 
     expect(data.body).toEqual(expectation);
 
     done();
   });
+
+    test('creates a new favorite on POST', async(done) => {
+      const expectation = {
+        ...beeMovie,
+        id: 2,
+        owner_id: 2
+      };
+  
+      const data = await fakeRequest(app)
+        .post('/api/favorites')
+        .set('Authorization', token)
+        .send(beeMovie)
+        .expect('Content-Type', /json/)
+        .expect(200);
+  
+      expect(data.body).toEqual(expectation);
+  
+      done();
+    });
+
+
 
 });
